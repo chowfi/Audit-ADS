@@ -36,12 +36,6 @@ All the input datasets can be linked using a unique string identifier, uidg. uid
 
 ### Output
 
-Markdown for a GitHub README would look the same as the conversion I previously made. Below is the same text re-formatted into Markdown, suitable for a GitHub README:
-
----
-
-## Output
-
 The output of the system formally is a severity level that takes integer values 1 through 5. According to DrivenData, the severity is based on cyanobacteria density. Cyanobacteria density is another column in the training data, which ranges from 0 to 804,667,500 cells per mL. 
 
 As Table 5 illustrates, density values are non-overlapping for distinct severity levels and higher density values are associated with higher severity levels. For example, severity level 5 encompasses the highest density values, greater than 10 million cells per mL. According to the World Health Organization (WHO), moderate and high risk health exposures occur at density levels ≥ 20, 000 cells per mL (WHO, 2003). 
