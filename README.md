@@ -120,3 +120,60 @@ Table 7: Evaluation of Performance Overall in Comparison to the Baseline Classif
 From table 8, we see that in general, accuracy is high overall and across subgroups. As table 6 indicates, the base rate for predicting high severity is 62%. This means a baseline classifier that predicts high severity (prediction = 1) in all cases will achieve 62% accuracy. Accuracy overall and for subgroups is higher than the base rate in all cases. In addition, both recall and precision are high; recall, which we care about the most, is (> 89%) overall and across subgroups. The relatively high rates of accuracy, recall, and precision suggest that the ADS has societal value and utility. Residents who live near toxic lakes and reservoirs will benefit from high recall while overburdened governmental agencies will benefit from the accuracy of the ADS.
 
 
+| Subgroups in reference to the statewide average | Poverty rate | Low income | Non-White | Hispanic/Latino |
+| --- | --- | --- | --- | --- |
+| Accuracy Above | 0.85 | 0.84 | 0.78 | 0.91 |
+| Accuracy Below | 0.80 | 0.78 | 0.81 | 0.77 |
+| Precision Above | 0.89 | 0.85 | 0.81 | 0.92 |
+| Precision Below | 0.80 | 0.79 | 0.82 | 0.77 |
+| Recall Above | 0.93 | 0.96 | 0.89 | 0.98 |
+| Recall Below | 0.93 | 0.90 | 0.94 | 0.91 |
+| False negative rate Above | 0.07 | 0.04 | 0.11 | 0.02 |
+| False negative rate Below | 0.07 | 0.10 | 0.06 | 0.09 |
+| False positive rate Above | 0.52 | 0.55 | 0.44 | 0.77 |
+| False positive rate Below | 0.47 | 0.44 | 0.48 | 0.48 |
+
+Table 8: Evaluation of Performance across Subgroups
+
+The ADS does make errors, but the errors are frequently less consequential. For example, the FNRs are low overall and across subgroups. The highest FNRs are 11% for census tracts with non-white population rates above the statewide average. False positive rates are higher (≈ 0.5) overall and across subgroups, which is less concerning. From the perspective of government agencies and water management organizations, the false positive rates are likely wasteful and increase business expenses. But from the perspective of the general public, they are not a significant concern.
+
+Lastly, table 8 allows us to consider fairness, which we discuss further in the next section. Overall, the performance of the model does not vary significantly across subgroups. Systematically, the ADS is slightly lower-performing for census tracts with above average non-white population percentages and highest performing for census tracts with above average Hispanic/Latino population percentages. Interestingly, the ADS performs better for both high poverty and low income census tracts; both accuracy and precision are higher than for the performance of the model overall.
+
+## Fairness
+
+According to the Aequitas Fairness Tree (Ghani, accessed April 17, 2023), the best fairness metric for this ADS use case is recall parity among the different subpopulations. Water quality managers can only allocate limited resources for in situ sampling because in situ sampling is labor intensive and expensive (Granger et al., 2018). Consequently, we should attempt to ensure the results of the ADS is distributed in a representative way. Since the false negative rate (FNR) is equal to 1−recall, we also look at false negative rate disparity among the sensitive subpopulations. Ultimately, we want to ensure that the ADS is not biased in errors, i.e. failing to provide assistance given group membership in a protected class.
+
+We use the following fairness metrics from Saleiro et al. (2018): false negative rate disparity, recall disparity, and predicted prevalence disparity. `gi` indicates membership in a protected group `i`, `gref` indicates the membership in the reference group, `ˆ Y` is the predicted value of the outcome, and `Y` is the true value of the outcome.
+
+
+$$FNR_{disparity_{g_j}} = \frac{FNR_{g_j}}{FNR_{g_{ref}}} = \frac{Pr(\hat{Y} = 0 | Y = 1, G = g_i)}{Pr(\hat{Y} = 0 | Y = 1, G = g_{ref})}$$
+$$Recall_{disparity_{g_j}} = \frac{Recall_{g_j}}{Recall_{g_{ref}}} = \frac{Pr(\hat{Y} = 1 | Y = 1, G = g_i)}{Pr(\hat{Y} = 1 | Y = 1, G = g_{ref})}$$
+$$PPrev_{disparity_{g_j}} = \frac{SelectionRate_{g_i}}{SelectionRate_{g_{ref}}} = \frac{Pr(\hat{Y} = 1 | G = g_i)}{Pr(\hat{Y} = 1 | G = g_{ref})}$$
+
+We consider these metrics to be fair using the 80\% rule:
+
+$$\tau \leq DisparityMeasure_{g_j} \leq \frac{1}{\tau} \Rightarrow 0.8 \leq DisparityMeasure_{g_j} \leq 1.25 $$
+
+We also consider additional fairness measures from FairLearn, including FNR difference, FPR difference, demographic parity difference, FNR ratio, FPR ratio, demographic parity ratio, and equalized odds ratio, which we define and present in table in the appendix. Qualitatively, the differences are small overall (all are less than $0.15$) and most ratios are between 0.8 and 1.25. The results do not lead us to different conclusions, compared to table.
+
+The disparity metrics that we present in table are equivalent equal to the ratio measures that FairLearn uses in the case where there are only two groups and the reference group is the group with the maximum value. For example, demographic parity ratio is defined as: $$\frac{minimum_{g_i}P(\hat{Y} = 1 | G = g_i)}{maximum_{g_i}P(\hat{Y} = 1 |G = g_i)}
+$$. 
+
+From table, we see that while there is recall parity across all subgroups, there are some FNR differences between subgroups (from table). There is a 5\% higher FNR in the non-White subgroup which means that the non-White subgroup has a higher likelihood of not receiving assistance when severity levels are high. Looking at non-White FNR disparity, where 
+
+$$FNR_{disparity_{non-white}} = \frac{FNR_{non-white}}{FNR_{white}} = \frac{0.11}{0.06} = 1.83$$
+
+(numbers from table -- FNR and Non-White), the FNR disparity for the non-White subgroup is 1.83 and falls outside of the rule-of-thumb for fairness of $ 0.8 \leq disparity \leq 1.25$. 
+
+|  |  | Poverty rate | Low Income | Non-White | Hispanic/Latino |
+| --- | --- | --- | --- | --- | --- |
+| Disparity | FNR | 1.12 | 0.38 | 1.83 | 0.26 |
+|  | Recall | 0.99 | 1.07 | 0.95 | 1.07  |
+|  | Predicted prevalence | 1.09 |
+
+ 1.18 | 0.93 | 1.19 |
+
+Table: Comparison of Fairness Metrics across Subgroups
+
+---
+
