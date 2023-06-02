@@ -32,7 +32,7 @@ The competition provides 23,570 rows of training and test data. Since the test d
 Auxiliary Data. We are using American Community Survey (ACS) 2015-2019 5-year estimates at the census tract level for our audit. We chose to use the 2015-2019 estimates, as there have been documented problems and delays associated with subsequent surveys due to COVID-19 (Wines and Cramer). There are approximately 74,000 census tracts for all 50 U.S. states, Washington D.C., and Puerto Rico. However, only 1,660 census tracts are uniquely represented in the training data. This occurs because some in-situ samples appear to come clustered in the same geographic areas. For example, we observed that 5,308 samples come from only a handful of census tracts in Chatham County, North Carolina. The features we have collected using census data include: race, ethnicity, median household income, and poverty rate.
 
 ### Input
-All the input datasets can be linked using a unique string identifier, uidg. uid identifies the date and location(latitude and longitude) for each sample. There are train labels, metadata, satellite data and elevation data. More information can be found in the 03_rds_final_report.pdf on this repo.
+All the input datasets can be linked using a unique string identifier, uid. uid identifies the date and location(latitude and longitude) for each sample. There are train labels, metadata, satellite data and elevation data. More information can be found in the 03_rds_final_report.pdf on this repo.
 
 ### Output
 
