@@ -156,22 +156,19 @@ $$\tau \leq DisparityMeasure_{g_j} \leq \frac{1}{\tau} \Rightarrow 0.8 \leq Disp
 
 We also consider additional fairness measures from FairLearn, including FNR difference, FPR difference, demographic parity difference, FNR ratio, FPR ratio, demographic parity ratio, and equalized odds ratio, which we define and present in table in the appendix. Qualitatively, the differences are small overall (all are less than $0.15$) and most ratios are between 0.8 and 1.25. The results do not lead us to different conclusions, compared to table.
 
-The disparity metrics that we present in table are equivalent equal to the ratio measures that FairLearn uses in the case where there are only two groups and the reference group is the group with the maximum value. For example, demographic parity ratio is defined as: $$\frac{minimum_{g_i}P(\hat{Y} = 1 | G = g_i)}{maximum_{g_i}P(\hat{Y} = 1 |G = g_i)}
-$$. 
+The disparity metrics that we present in table are equivalent equal to the ratio measures that FairLearn uses in the case where there are only two groups and the reference group is the group with the maximum value. For example, demographic parity ratio is defined as: $$\frac{minimum_{g_i}P(\hat{Y} = 1 | G = g_i)}{maximum_{g_i}P(\hat{Y} = 1 |G = g_i)}$$. 
 
 From table, we see that while there is recall parity across all subgroups, there are some FNR differences between subgroups (from table). There is a 5\% higher FNR in the non-White subgroup which means that the non-White subgroup has a higher likelihood of not receiving assistance when severity levels are high. Looking at non-White FNR disparity, where 
 
 $$FNR_{disparity_{non-white}} = \frac{FNR_{non-white}}{FNR_{white}} = \frac{0.11}{0.06} = 1.83$$
 
-(numbers from table -- FNR and Non-White), the FNR disparity for the non-White subgroup is 1.83 and falls outside of the rule-of-thumb for fairness of $ 0.8 \leq disparity \leq 1.25$. 
+(numbers from table -- FNR and Non-White), the FNR disparity for the non-White subgroup is 1.83 and falls outside of the rule-of-thumb for fairness of  0.8 <= disparity <= 1.25. 
 
 |  |  | Poverty rate | Low Income | Non-White | Hispanic/Latino |
 | --- | --- | --- | --- | --- | --- |
 | Disparity | FNR | 1.12 | 0.38 | 1.83 | 0.26 |
 |  | Recall | 0.99 | 1.07 | 0.95 | 1.07  |
-|  | Predicted prevalence | 1.09 |
-
- 1.18 | 0.93 | 1.19 |
+|  | Predicted prevalence | 1.09 | 1.18 | 0.93 | 1.19 |
 
 Table: Comparison of Fairness Metrics across Subgroups
 
