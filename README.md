@@ -98,3 +98,25 @@ Based on the ACS data we have, we identify sensitive groups using the following 
 
 - **Low Income Community**: this is a designation from Internal Revenue Code §45D(e). Broadly, it refers to any census tract where the poverty rate is greater than or equal to 20 percent or the median family income is less than 80 percent of either the statewide median family income or the metropolitan area median family income–whichever is greater. We propose a modified version of this definition, given the complexity associated with recreating the first approach, that only compares the median family income to the statewide median.
 
+
+## Accuracy
+
+Since we turned the ADS into a binary classification problem, we assess performance across conventional metrics like recall, precision, and accuracy. Binary classification makes sense in this audit because we are most interested in whether the ADS fails to identify high-risk groups; the precise level of severity is less significant.
+
+We evaluate the performance of the ADS overall and across the various subpopulations outlined above. We prioritize recall and false negative rates (FNR) in our assessment of the ADS as there are greater risks for failing to detect algal blooms: not issuing a public health warning, exposure to toxic bacteria, and serious health and safety consequence.
+
+Table 7 presents the results from both the baseline classifier and the overall highest-performing ensemble classifier across various performance metrics that we care about. Table 8 shows the performance of the ADS model across subgroups. We look at the performance of the model in census tracts that are above the statewide average for a given subgroup definition and below.
+
+|  | Baseline | Overall |
+| - | - | - |
+| Accuracy | 0.69 | 0.81 |
+| Precision | 0.69 | 0.82 |
+| Recall | 1 | 0.93 |
+| False Negative Rate | 0 | 0.07 |
+| False Positive Rate | 1 | 0.48 |
+
+Table 7: Evaluation of Performance Overall in Comparison to the Baseline Classifier
+
+From table 8, we see that in general, accuracy is high overall and across subgroups. As table 6 indicates, the base rate for predicting high severity is 62%. This means a baseline classifier that predicts high severity (prediction = 1) in all cases will achieve 62% accuracy. Accuracy overall and for subgroups is higher than the base rate in all cases. In addition, both recall and precision are high; recall, which we care about the most, is (> 89%) overall and across subgroups. The relatively high rates of accuracy, recall, and precision suggest that the ADS has societal value and utility. Residents who live near toxic lakes and reservoirs will benefit from high recall while overburdened governmental agencies will benefit from the accuracy of the ADS.
+
+
