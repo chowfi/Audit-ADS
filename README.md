@@ -143,7 +143,7 @@ Lastly, table 8 allows us to consider fairness, which we discuss further in the 
 
 According to the Aequitas Fairness Tree (Ghani, accessed April 17, 2023), the best fairness metric for this ADS use case is recall parity among the different subpopulations. Water quality managers can only allocate limited resources for in situ sampling because in situ sampling is labor intensive and expensive (Granger et al., 2018). Consequently, we should attempt to ensure the results of the ADS is distributed in a representative way. Since the false negative rate (FNR) is equal to 1−recall, we also look at false negative rate disparity among the sensitive subpopulations. Ultimately, we want to ensure that the ADS is not biased in errors, i.e. failing to provide assistance given group membership in a protected class.
 
-We use the following fairness metrics from Saleiro et al. (2018): false negative rate disparity, recall disparity, and predicted prevalence disparity. `gi` indicates membership in a protected group `i`, `gref` indicates the membership in the reference group, `ˆ Y` is the predicted value of the outcome, and `Y` is the true value of the outcome.
+We use the following fairness metrics from Saleiro et al. (2018): false negative rate disparity, recall disparity, and predicted prevalence disparity. $g_i$ indicates membership in a protected group `i`, $g_{ref}$ indicates the membership in the reference group, $\hat{Y}$ is the predicted value of the outcome, and `Y` is the true value of the outcome.
 
 
 $$FNR_{disparity_{g_j}} = \frac{FNR_{g_j}}{FNR_{g_{ref}}} = \frac{Pr(\hat{Y} = 0 | Y = 1, G = g_i)}{Pr(\hat{Y} = 0 | Y = 1, G = g_{ref})}$$
@@ -154,15 +154,15 @@ We consider these metrics to be fair using the 80\% rule:
 
 $$\tau \leq DisparityMeasure_{g_j} \leq \frac{1}{\tau} \Rightarrow 0.8 \leq DisparityMeasure_{g_j} \leq 1.25 $$
 
-We also consider additional fairness measures from FairLearn, including FNR difference, FPR difference, demographic parity difference, FNR ratio, FPR ratio, demographic parity ratio, and equalized odds ratio, which we define and present in table in the appendix. Qualitatively, the differences are small overall (all are less than $0.15$) and most ratios are between 0.8 and 1.25. The results do not lead us to different conclusions, compared to table.
+We also consider additional fairness measures from FairLearn, including FNR difference, FPR difference, demographic parity difference, FNR ratio, FPR ratio, demographic parity ratio, and equalized odds ratio, which we define and present in table in the appendix. Qualitatively, the differences are small overall (all are less than $0.15$) and most ratios are between 0.8 and 1.25. The results do not lead us to different conclusions, compared to table 9.
 
-The disparity metrics that we present in table are equivalent equal to the ratio measures that FairLearn uses in the case where there are only two groups and the reference group is the group with the maximum value. For example, demographic parity ratio is defined as: $$\frac{minimum_{g_i}P(\hat{Y} = 1 | G = g_i)}{maximum_{g_i}P(\hat{Y} = 1 |G = g_i)}$$. 
+The disparity metrics that we present in table 9 are equivalent equal to the ratio measures that FairLearn uses in the case where there are only two groups and the reference group is the group with the maximum value. For example, demographic parity ratio is defined as: $$\frac{minimum_{g_i}P(\hat{Y} = 1 | G = g_i)}{maximum_{g_i}P(\hat{Y} = 1 |G = g_i)}$$. 
 
-From table, we see that while there is recall parity across all subgroups, there are some FNR differences between subgroups (from table). There is a 5\% higher FNR in the non-White subgroup which means that the non-White subgroup has a higher likelihood of not receiving assistance when severity levels are high. Looking at non-White FNR disparity, where 
+From table 9, we see that while there is recall parity across all subgroups, there are some FNR differences between subgroups (from table). There is a 5\% higher FNR in the non-White subgroup which means that the non-White subgroup has a higher likelihood of not receiving assistance when severity levels are high. Looking at non-White FNR disparity, where 
 
 $$FNR_{disparity_{non-white}} = \frac{FNR_{non-white}}{FNR_{white}} = \frac{0.11}{0.06} = 1.83$$
 
-(numbers from table -- FNR and Non-White), the FNR disparity for the non-White subgroup is 1.83 and falls outside of the rule-of-thumb for fairness of  0.8 <= disparity <= 1.25. 
+(numbers from table 8 -- FNR and Non-White), the FNR disparity for the non-White subgroup is 1.83 and falls outside of the rule-of-thumb for fairness of  0.8 <= disparity <= 1.25. 
 
 |  |  | Poverty rate | Low Income | Non-White | Hispanic/Latino |
 | --- | --- | --- | --- | --- | --- |
@@ -170,7 +170,66 @@ $$FNR_{disparity_{non-white}} = \frac{FNR_{non-white}}{FNR_{white}} = \frac{0.11
 |  | Recall | 0.99 | 1.07 | 0.95 | 1.07  |
 |  | Predicted prevalence | 1.09 | 1.18 | 0.93 | 1.19 |
 
-Table: Comparison of Fairness Metrics across Subgroups
+Table 9: Comparison of Fairness Metrics across Subgroups
 
----
+### Interpretability
+
+In terms of interpretability, the model has a relatively low level of transparency due to its ensemble structure, which combines many boosted trees and incorporates numerous features, resulting in a highly non-linear model. Additionally, though we hoped to use LIME or SHAP to better understand the features used in the models, we ultimately found that the functions in both Python packages do not work well with the type of complex ensemble structured used here. Though the packages are model-agnostic, it is challenging to apply them to a pipeline that does not utilize built-in predict functions.
+
+Instead, we relied on the `feature importances` methods from the `catboost`, `lightgbm` and `xgboost` libraries. The results of the feature importances that we present here are similar to the feature importances that the author of the ADS shared with the winning competition model. As can be seen from table 10, longitude, cluster, elevation and month were the most important features in predicting an accurate outcome across all models. In other words, the primary focus of the ADS solution is on fitting a curve based on temporal and spatial variations, which may not generalize well to situations where the underlying spatial and temporal patterns are substantially different from those captured by the model. In such cases, the performance of the model may be suboptimal and additional data sources or modeling approaches may be required to achieve accurate predictions.
+
+The feature importance of longitude is of some concern, as it could indicate leakage. Though we carefully sampled the test data to prevent any spatial overlap with the training data, during training and cross-validation the model may be memorizing patterns and information correlated with longitude that may not be available when the ADS is deployed. The creator of the ADS seems to have considered this and accounted for the probability that a sample is in the test data during cross-validation. However, based on the feature importances, we recommend further investigation of leakage, particularly with the successful implementation of tools like LIME and SHAP.
+
+### Stability
+
+To assess stability, we evaluated the performance of the ADS over 10 random samples of the original test data. We focused on the performance of a single model, trained on one dataset, to reduce runtime issues we encountered with hyperparameter tuning. 
+
+It’s important to evaluate the stability of the model over random test set samples, as the data used in deployment might look very different. Additionally, these findings will indicate whether researchers might be able to deploy this model in a range of disparate contexts.
+
+As figure A2 demonstrates, overall the model is relatively stable across train/test splits. Only the false positive rate has some variation and a larger interquartile range. While a more thorough analysis might use external datasets and different contexts (e.g., large bodies of water as opposed to inland lakes and reservoirs– the focus of this contest), we exploit the fact that we filtered the data to records post-2016 and examine the performance of the ADS on unseen pre-2016 data. 
+
+Pre-2016 data are more likely to differ from the training data than the held-out test set that we are using. As figure A3 shows, the ADS performs similarly well in terms of stability though there are some differences in the level of its performance. For example, accuracy and precision are both lower.
+
+In figure A4, we examine the fairness metrics of the model across different samples of the test data. Just as we observed some evidence of disparate impact for samples in areas with above average non-White population percentages, we see that the fairness metrics fluctuate the most for this subgroup. The values for false negative rate disparity–one of the fairness metrics we prioritize–range from one to five. This means that in some test set samples, the false negative rate is five times larger for samples in census tracts with above average non-White population percentages. There is also more variation for the percent non-White and percent Hispanic or Latino subgroups when considering the predicted prevalence disparity. However, because we are less concerned about selection rates in the context of this ADS, the variation in predicted prevalence disparity is not a concern.
+
+### Summary
+
+#### Data
+
+The data are appropriate for this ADS, given that the central problem involves visible changes in environmental conditions. It is costly and time-consuming to manually sample all bodies of water in the U.S. and relying on manual sampling will likely lead to delays in starting mitigation and alerting the public. 
+
+Computer vision techniques are already established methods for identifying cyanobacteria blooms, particularly in large bodies of water like oceans (Ye et al., 2021; Baek et al., 2021). However, there has been less attention paid to the challenge of identifying cyanobacteria blooms in small inland lakes and reservoirs. 
+
+There are also seasonal and temporal patterns, so leveraging time-series data can be especially helpful in predicting new algal bloom cases. While detailed data on the water quality and surrounding environment would certainly improve the performance of the model, we do find that the winning model improves accuracy and precision while maintaining high recall relative to a baseline classifier.
+
+#### Robustness, Accuracy, and Fairness
+
+The ADS performs well. Accuracy is ≈ 81%, which is an improvement over a simple baseline classifier. In the test data, the base rate of high-severity samples is only ≈ 69%. The ADS also performs well on the performance metrics we care about, given the assistive nature of the intervention and the adverse consequences for failing to identify a positive case. 
+
+We identified only one fairness concern with respect to non-White subgroups. Otherwise, the ADS does not appear to be systematically biased against sensitive subgroups like race, income, and ethnicity. FNR disparities are low for both low-income and Hispanic
+
+/Latino subgroups. Though not ideal, these disparity values suggest the model may perform better for these groups. Both performance metrics and fairness metrics remain moderately stable across different samples of unseen test data with the highest variation for the non-White subgroup as well.
+
+State and local governments, water management agencies, and other environmental organizations will all benefit from the deployment of this ADS. The high accuracy and precision of the model, especially in comparison to the baseline classifier, means that inspections of inland lakes and reservoirs will occur more efficiently and with fewer costs. 
+
+For nearby residents and those most affected by the outputs of the ADS, the high recall and low FNR–measures that are constant across various test set samples–should inspire confidence. These stakeholders are at high-risk if the ADS fails to detect an algal bloom and no inspection or warning is issued. The high recall may come at the expense of precision. Those who manage these bodies of water may advocate for higher precision regardless of the implications on recall to save time and resources, but fairness and equity considerations mean that we should continue to prioritize high recall and low FNRs in the deployment of the model.
+
+### Deployment
+
+Overall, the ADS exhibited high levels of performance and fairness across various subpopulations. Although there were some differences in FNR for non-White subgroups, the magnitude of these differences was minimal. While it is possible for the ADS to overlook certain areas that require water sampling, having a human in the loop could help address this issue by utilizing their expertise or alternative sources of information. This, in turn, can help reduce the disparity in FNR. Hence, we are comfortable in deploying this ADS in the public sector with some human oversight.
+
+### Recommendations
+
+In terms of data collection, one area of improvement could be to collect more samples from the Northeast region, as it had the smallest proportion of training observations (see table 1) and the highest RMSE (see table A3). This could help to ensure that the model is trained on a representative sample and could therefore make more accurate and fair predictions.
+
+In terms of data processing, one area of improvement could be in the creation of the ad-hoc cluster variable. While this step is beneficial for accounting for spatial variations, there might be more systematic and statistically rigorous ways to account for such variations. Methods such as spatial autocorrelation analysis or spatial regression could be explored. 
+
+In terms of analysis methodology, incorporating more domain knowledge into the model could be beneficial. This could be in the form of engineered features based on domain expertise.
+
+Overall, our findings suggest the ADS is accurate, fair, and robust. However, we recommend that researchers involved in the project continue to audit the ADS and investigate the source of the FNR disparities. Perhaps there are issues with the underlying data or technical bias was introduced in the model pipeline. Additionally, future work should evaluate performance across disaggregated racial groups to assess whether one racial group is driving the disparity. Researchers should consider intersectional disparities as well. 
+
+We briefly examined the relationship between poverty and race, for example, and did not observe any disparities. We recommend that a more formal, comprehensive investigation assess the performance across all combinations of racial, ethnic, and socioeconomic characteristics.
+
+Note: Tables/Figures not on the ReadMe can be found in the 03_rds_final_report.pdf on this repo.
+
 
