@@ -63,6 +63,38 @@ Using this classification approach, we construct a binary outcome label for a hi
 |    3     |        20        |
 |    5     |        < 1       |
 
----
 
+## Implementation and Validation
+
+### Data cleaning / Pre-processing
+
+In this section, we document several decision that the ADS winner made, which may have had consequences on both accuracy and fairness performance. Because the ADS does not use scikit-learn, we are not able to run ml-inspect and instead our inspection of the ADS is manual.
+
+During pre-processing, the winner of this ADS did not normalize the elevation data and the satellite data already came normalized. One decision the winner of this ADS made was to create an ad-hoc cluster variable (represented by the ordinal variable ’cluster’) as there is substantial spatial variation in the target variable. For example, the south region had the lowest average severity levels at 1.57 while the west region was 3.74. By creating this ad-hoc variable, he was able to better model the patterns in the different regions based on more granular spatial groupings.
+
+### High Level Implementation
+
+The solution uses an ensemble of three different boosted tree models – XGBoost, CatBoost and LightBoost – and features such as region, date, location cluster, elevation and Sentinel-2 satellite images – red, blue and green spectral bands at 1,000 and 2,500 meters from latitude and longitude.
+
+To optimize the tree models, the solution employed a process of hyper-tuning nine different parameters. Two of these parameters took integer values and the remaining seven were categorical. The integer-valued parameters were the number of boosted trees and maximum tree depth. The categorical parameters included the type of elevation data, type of XY coordinates, type of slope data, type of region data, a boolean indicating whether to use sample weights when fitting the model, a boolean indicating whether to treat categorical features as numeric, and the type of satellite data to use.
+
+### ADS Validation
+
+This ADS is validated by the region-averaged root mean squared error (RMSE). The smaller the error value, the more accurate the model is. Region-averaged RMSE is calculated by taking the square root of the mean of squared differences between estimated and observed severity values for each region and averaging across regions.
+
+Given this performance metric, the author of the ADS used regression models to generate a continuous outcome. He then rounded the predictions to the nearest integer value. For the ensemble models, he averaged across the predictions before rounding, and then rounded the final result. The ADS met its goal of achieving high performance as evidenced by winning second place in the competition with a sufficiently low region-averaged RMSE of 0.7616. Using the sampled dataset, our implementation of the ADS scored a similar region-averaged RMSE on the test set of 0.7275.
+
+## Outcomes
+
+We study the performance of the ADS across four subpopulations. Since we are using a binary version of the outcome variable, we use metrics commonly studied in binary classification problems, which we outline below. To further assess the validity of our findings, we compare our results to the performance of the ADS across subpopulations using RMSE averaged over the four regions.
+
+### Subpopulations
+
+Based on the ACS data we have, we identify sensitive groups using the following construct definitions. We evaluate the performance of the ADS across these sensitive groups.
+
+- **Above average poverty rate**: We have ACS data at both the census tract and state level. We create indicator variables that denote whether the poverty rate in a given census tract is above the statewide average.
+
+- **Above average shares of racial and ethnic subgroups: We create a series of indicator variables, corresponding to racial and ethnic subgroups that denote whether a given census tract has an above average population share of each subgroup. We generate these indicator variables for each subgroup in comparison to the statewide average. We also create an indicator that aggregates all non-white racial subgroups. For this audit, we focus on the indicator for non-white racial subgroups to reduce the total number of subgroups that we discuss. However, an expansion of this audit should ultimately consider the performance of the ADS across all racial subgroups as there may be important heterogeneity.
+
+- **Low Income Community: this is a designation from Internal Revenue Code §45D(e). Broadly, it refers to any census tract where the poverty rate is greater than or equal to 20 percent or the median family income is less than 80 percent of either the statewide median family income or the metropolitan area median family income–whichever is greater. We propose a modified version of this definition, given the complexity associated with recreating the first approach, that only compares the median family income to the statewide median.
 
