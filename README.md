@@ -206,9 +206,7 @@ There are also seasonal and temporal patterns, so leveraging time-series data ca
 
 The ADS performs well. Accuracy is ≈ 81%, which is an improvement over a simple baseline classifier. In the test data, the base rate of high-severity samples is only ≈ 69%. The ADS also performs well on the performance metrics we care about, given the assistive nature of the intervention and the adverse consequences for failing to identify a positive case. 
 
-We identified only one fairness concern with respect to non-White subgroups. Otherwise, the ADS does not appear to be systematically biased against sensitive subgroups like race, income, and ethnicity. FNR disparities are low for both low-income and Hispanic
-
-/Latino subgroups. Though not ideal, these disparity values suggest the model may perform better for these groups. Both performance metrics and fairness metrics remain moderately stable across different samples of unseen test data with the highest variation for the non-White subgroup as well.
+We identified only one fairness concern with respect to non-White subgroups. Otherwise, the ADS does not appear to be systematically biased against sensitive subgroups like race, income, and ethnicity. FNR disparities are low for both low-income and Hispanic/Latino subgroups. Though not ideal, these disparity values suggest the model may perform better for these groups. Both performance metrics and fairness metrics remain moderately stable across different samples of unseen test data with the highest variation for the non-White subgroup as well.
 
 State and local governments, water management agencies, and other environmental organizations will all benefit from the deployment of this ADS. The high accuracy and precision of the model, especially in comparison to the baseline classifier, means that inspections of inland lakes and reservoirs will occur more efficiently and with fewer costs. 
 
