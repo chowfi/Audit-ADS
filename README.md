@@ -2,7 +2,7 @@
 
 The ADS uses satellite imagery to classify the severity of cyanobacteria blooms in small water bodies. The data and ADS come from a data science competition hosted by NASA and DrivenData. Algal blooms are an environmental justice issue. Because this ADS could help water quality managers better allocate resources which influence public health warnings for drinking water and recreation, the algorithm must be accurate not only for the overall population but also for sensitive subpopulations.
 
-Relevant Links
+Relevant Links <br>
 • Original Second Place Repository: https://github.com/apwheele/algaebloom <br>
 • Competition Website: https://www.drivendata.org/competitions/143/tick-tick-bloom/page/650/ <br>
 
